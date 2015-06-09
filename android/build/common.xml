@@ -389,6 +389,64 @@ Common ant tasks and macros for building Android-based Titanium modules and proj
 			<fileset dir="${kroll.v8.project.dir}" includes="libs/**/lib*.so"/>
 		</copy>
 	</target>
+	
+	<target name="rg.build" depends="generate.kroll.v8.bindings">
+		<delete includeemptydirs="true" failonerror="false">
+			<fileset dir="/Users/admin/Library/Application Support/Titanium/mobilesdk/osx/4.0.0/android/native/include" includes="**/*" defaultexcludes="false"/>
+		</delete>
+		<delete includeemptydirs="true" failonerror="false">
+			<fileset dir="/Users/admin/Library/Application Support/Titanium/mobilesdk/osx/4.0.0/android/native/libs" includes="**/libkroll-v8.so" defaultexcludes="false"/>
+		</delete>
+		<delete includeemptydirs="true" failonerror="false">
+			<fileset dir="/Users/admin/Library/Application Support/Titanium/mobilesdk/osx/4.0.0/android/native/libs" includes="**/libstlport_shared.so" defaultexcludes="false"/>
+		</delete>
+		<property name="ndk.build.args" value=""/>
+		<property name="kroll.v8.build.x86" value=""/>
+		<exec executable="${ndk.build}" dir="${kroll.v8.project.dir}" failonerror="true">
+			<env key="ANDROID_NDK" file="${android.ndk}"/>
+			<env key="ANDROID_PLATFORM" file="${android.platform}"/>
+			<env key="BUILD_X86" value="${kroll.v8.build.x86}"/>
+			<arg value="TI_DEBUG=${ti.debug}"/>
+			<arg line="${ndk.build.args}"/>
+		</exec>
+		<copy todir="/Users/admin/Library/Application Support/Titanium/mobilesdk/osx/4.0.0/android/native/include">
+			<fileset dir="${kroll.v8.project.dir}/generated" includes="**/*.h"/>
+		</copy>
+		<copy todir="/Users/admin/Library/Application Support/Titanium/mobilesdk/osx/4.0.0/android/native">
+			<fileset dir="${kroll.v8.project.dir}" includes="libs/**/lib*.so"/>
+		</copy>
+	</target>
+    
+    <target name="rg.common">
+        <build.ti.ant.tasks/>
+        <define.ti.ant.tasks/>
+        <antcall target="update.apis"/>
+        <antcall target="build.titanium.jar"/>
+        <copy todir="/Users/admin/Library/Application Support/Titanium/mobilesdk/osx/4.0.0/android">
+            <fileset dir="${dist.dir}" includes="**/*.jar" excludes="**/titanium-*.jar"/>
+        </copy>
+    </target>
+    
+    <target name="rg.temp">
+        <copy todir="/Users/admin/Library/Application Support/Titanium/mobilesdk/osx/4.0.0/android/templates">
+            <fileset dir="/Users/admin/Library/titanium_mobile/android/templates"/>
+        </copy>
+    </target>
+    
+    <target name="rg.module" depends="build.titanium,rg.build">
+        <build.ti.ant.tasks/>
+        <define.ti.ant.tasks/>
+        <antcall target="build.all.modules"/>
+        <copy todir="/Users/admin/Library/Application Support/Titanium/mobilesdk/osx/4.0.0/android/modules">
+            <fileset dir="/Users/admin/Library/titanium_mobile/dist/android" includes="**/titanium-*.jar"/>
+        </copy>
+        <copy todir="/Users/admin/Library/Application Support/Titanium/mobilesdk/osx/4.0.0/android/modules">
+            <fileset dir="/Users/admin/Library/titanium_mobile/dist/android" includes="**/titanium-*.res.zip"/>
+        </copy>
+        <copy todir="/Users/admin/Library/Application Support/Titanium/mobilesdk/osx/4.0.0/android">
+            <fileset dir="/Users/admin/Library/titanium_mobile/dist/android" includes="modules.json"/>
+        </copy>
+    </target>
 
 	<target name="build.kroll.common.jar">
 		<property name="kroll.common.classes.dir" location="${dist.classes.dir}/kroll-common"/>

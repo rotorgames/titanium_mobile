@@ -37,7 +37,7 @@ if [ "$NUM_CPUS" != "" ]; then
 	ARGS="-j $NUM_CPUS"
 fi
 
-"$ANDROID_NDK/ndk-build" \
+"/Users/admin/Library/android-ndk-r10d/ndk-build" \
 	NDK_APPLICATION_MK=$THIS_DIR/Application.mk \
 	NDK_PROJECT_PATH=$THIS_DIR \
 	NDK_MODULE_PATH=$THIS_DIR/src/ndk-modules \
